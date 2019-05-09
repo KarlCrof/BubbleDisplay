@@ -10,13 +10,28 @@ Karl Crofskey, 2183664.
 
 * explain connections
 * explain common cathode
-* pull down resistor / mosfet resistor
+* pull down resistor
 
-### current limiting
+### Current Limiting
+*QDSP6064 7-segment 4 digit bubble display datasheet*  
 <img src="https://i.ibb.co/M5BWF7f/7segdata.jpg" alt="7segdata" border="0">
 
-Above is a relevant section of the QDSP6064 7-segment 4 digit bubble display datasheet.
+A current limiting resistor is required, for each LED segment, in order to limit the current to 5mA (to protect each from over-current damage).
 
+Given the typical LED forward voltage drop of 1.6V, and using the Teensy 3.2 Vcc of 3.3V, Ohm's law was applied to find the minimum resistance required to achieve this.  
+
+> R = V<sub>R</sub> / i  
+> R = (3.3 - 1.6)V / 5mA  
+> R = 340Ω  
+
+Hence, a 390Ω resistor was used in series with each of the LED segments as the next highest available resistance.
+
+*IRLU8743 N-channel enhancement type power MOSFET datasheet*  
+<img src="https://i.ibb.co/QbzmJbC/mosfetdata.jpg" alt="mosfetdata" border="0">
+
+A current limiting resistor is further needed in series with the pins connected the gate of the MOSFETS (used to switch the digits on and off). This is because, as the pin is initially turned HIGH, the charging capacitor of the MOSFET causes an inrush current to be drawn - potentially damaging to the Teensy microcontroller which has a limited current sourcing capability of 50mA.
+
+A 1KΩ resistor was used to limit the current to 3.3mA, a compromise between sufficient current limiting and the decreased switching frequency of the MOSFET (due to the increased RC time constant).
 
 
 ## Code Design

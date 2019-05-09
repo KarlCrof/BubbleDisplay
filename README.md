@@ -41,7 +41,7 @@ A 1KΩ resistor was used to limit the current to 3.3mA, a compromise between hav
 
 
 ## Breadboard Implementation
-<img src="https://i.ibb.co/Z6Tg4ns/20190508-151012-annotated.jpg" alt="20190508-151012-annotated" border="0">
+<img src="https://i.ibb.co/1sspBFW/20190508-151012-annotated.jpg" alt="20190508-151012-annotated" border="0">
 
 ## Source Code
 ### modifying 7-seg library

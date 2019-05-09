@@ -6,7 +6,7 @@ Karl Crofskey, 2183664.
 
 
 ## Circuit Schematic
-<img src="https://i.ibb.co/wMDmfvX/schematic.jpg" alt="schematic" border="0">
+<img src="https://i.ibb.co/M6vz32c/schematic.jpg" alt="schematic" border="0">
 
 * explain connections
 * explain common cathode
@@ -15,7 +15,8 @@ Karl Crofskey, 2183664.
 ### current limiting
 <img src="https://i.ibb.co/M5BWF7f/7segdata.jpg" alt="7segdata" border="0">
 
-* 390 resistor value
+Above is a relevant section of the QDSP6064 7-segment 4 digit bubble display datasheet.
+
 
 
 ## Code Design

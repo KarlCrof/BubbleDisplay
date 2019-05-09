@@ -2,8 +2,11 @@
 Project 1 for MG7013 Embedded Systems  
 Karl Crofskey, 2183664.
 
-## Project Requirements
+## Project Introduction
 
+* LED basics
+* 7-seg pinout
+* MOSFET pinout
 
 ## Circuit Schematic
 <img src="https://i.ibb.co/M6vz32c/schematic.jpg" alt="schematic" border="0">
@@ -12,7 +15,7 @@ Karl Crofskey, 2183664.
 * explain common cathode
 * pull down resistor
 
-### Current Limiting
+### _Current Limiting_
 *QDSP6064 7-segment 4 digit bubble display datasheet*  
 <img src="https://i.ibb.co/M5BWF7f/7segdata.jpg" alt="7segdata" border="0">
 
@@ -29,16 +32,16 @@ Hence, a 390Ω resistor was used in series with each of the LED segments as the 
 *IRLU8743 N-channel enhancement type power MOSFET datasheet*  
 <img src="https://i.ibb.co/QbzmJbC/mosfetdata.jpg" alt="mosfetdata" border="0">
 
-A current limiting resistor is further needed in series with the pins connected the gate of the MOSFETS (used to switch the digits on and off). This is because, as the pin is initially turned HIGH, the charging capacitor of the MOSFET causes an inrush current to be drawn - potentially damaging to the Teensy microcontroller which has a limited current sourcing capability of 50mA.
+A current limiting resistor is further needed in series with the pins connected the gate of the MOSFETS (used to switch the digits on and off). This is because, as the pin is initially turned HIGH, the charging capacitor of the MOSFET causes an inrush current to be drawn - not sufficiently limited by the 0.85Ω gate resistance - potentially damaging the Teensy microcontroller which has a specified current sourcing capability limit.
 
-A 1KΩ resistor was used to limit the current to 3.3mA, a compromise between sufficient current limiting and the decreased switching frequency of the MOSFET (due to the increased RC time constant).
+A 1KΩ resistor was used to limit the current to 3.3mA, a compromise between having low current and the impact on the MOSFET's switching frequency (increased RC time constant).
 
 
 ## Code Design
 
 
 ## Breadboard Implementation
-
+<img src="https://i.ibb.co/Z6Tg4ns/20190508-151012-annotated.jpg" alt="20190508-151012-annotated" border="0">
 
 ## Source Code
 ### modifying 7-seg library

@@ -10,7 +10,7 @@ Karl Crofskey, 2183664.
 
 The aim of this project is to create an embedded system circuit utilising a seven segment 4 digit 'bubble' display. This is in order to explore how the 7-seg display interfaces with a microcontroller in displaying specific and multiple numeric characters.  
 
-A stop watch application was chosen for this purpose. Two buttons, START/STOP and RESET, will be pushed by the user in order to control the stopwatch application. A tenth of a second was determined to be suitable timing resolution for this application and the required timing accuracy is a maximum of 100ms deviation from a comparison stopwatch, over 10 seconds (started at the same time). Timing will use the millis() Arduino function.  
+A stopwatch application was chosen for this purpose. Two buttons, START/STOP and RESET, will be pushed by the user in order to control the stopwatch application. A tenth of a second was determined to be suitable timing resolution for this application and the required timing accuracy is a maximum of 100ms deviation from a comparison stopwatch, over 10 seconds (started at the same time). Timing will use the millis() Arduino function.  
 
 The 7-seg display is of common cathode type (grounds of each digit's LEDs connected) and power (N-channel, enhancement type) MOSFETs will be used in order to sink the total current of each digit to ground, instead of into a digital I/O pin – this is due to the limted current sinking / sourcing capability of the microcontroller.  
 
@@ -52,7 +52,7 @@ A 1KΩ resistor was used to limit the current to 3.3mA, a compromise between hav
 <img src="https://i.ibb.co/yRNFh1D/codediag.jpg" alt="codediag" border="0">
 
 * The program will use 7seg library to interface with the bubble display. Initialization gives the library the correct digital output pin connected to each seven segment display pin.
-* The count of the stopwatch timer is displayed. This is initialized to zero seconds, zero deciseconds.
+* The count of the stopwatch timer is displayed. This is initialized as zero.
 * If the START button is pressed (START/STOP while paused), the stopwatch count starts increasing. If there was already a count value, the timer resumes from that point.
 * If the STOP button is pressed (START/STOP while counting), the stopwatch count pauses at that current value.
 * If the RESET button is pressed, the count resets back to the default count of zero (and stops counting if it was doing so).
@@ -160,11 +160,11 @@ Debouncing of the buttons has been added with a delay of 200ms. When a button is
     deciSecond = time_stopped_ms / 100;
   }
 ```
-Millis() returns the amount of milliseconds elapsed since program execution. While counting, the difference between the current time and the time when the stopwatch was started is saved into 'time_elapsed_ms'. The stopwatch displays this increasing number by updating the current deciSecond count.
+The function millis() returns the amount of milliseconds elapsed since program execution. While counting, the difference between the current time and the time when the stopwatch was started is saved into 'time_elapsed_ms'. The stopwatch displays this increasing number by updating the current deciSecond count (milliseconds / 100).
 
-The count when stopped is saved and displayed as 'time_stopped_ms'. This is added to the cumulative count 'total_time_elapsed_ms' so that the stop watch resumes from this point, when re-started.
+The count when stopped is saved and displayed as 'time_stopped_ms'. This is added to the cumulative count 'total_time_elapsed_ms' so that the stopwatch resumes from this point, when re-started.
 
-When the stop watch is reset, state flags are reset to their default logic state and the cumulative count is reset.
+When the stopwatch is reset, state flags are reset to their default logic state and the cumulative count is reset.
 
 
 ## System Verification
@@ -172,7 +172,7 @@ When the stop watch is reset, state flags are reset to their default logic state
 " target="_blank"><img src="http://img.youtube.com/vi/91QzzcyFhBQ/0.jpg" 
 alt="verification" width="240" height="180" border="10" /></a>
 
-Starting a digital stopwatch concurrently, the decisecond timing is accurate.
+Starting a digital stopwatch concurrently, the decisecond timing is accurate. Pause for comparison.
 
 ## Project Video
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=KN3t0vwgOfI
@@ -181,7 +181,7 @@ alt="video" width="240" height="180" border="10" /></a>
 
 ## Conclusion
 
-An issue encountered was when the count exceeded the maximum 4 digit count of 999.9 into 5 digits. The number right-shifted one position (i.e. becoming 1999), resulting in the loss of count precision and potential confusion due to the placement of the decimal point. There is also an expected issue when the cumulative count overflows, if the timer is left counting long enough. A 32 bit unsigned integer represents a maximum count of 4,294,967,295 ms or approximately 49 days. Perhaps not relevant to this application, though applicable to timing applications intended for continuous operation. A solution to both of these issues would be to limit the maximum count to the constrains of the display - i.e. 999900 ms elapsed.
+An issue encountered was when the count exceeded the maximum 4 digit count of 999.9 into 5 digits. The number right-shifted one position (i.e. becoming 1999), resulting in the loss of count precision and potential confusion due to the placement of the decimal point. There is also an expected issue when the cumulative count overflows, if the timer is left counting long enough. A 32 bit unsigned integer represents a maximum count of 4,294,967,295 ms or approximately 49 days. Perhaps not relevant to this application, though applicable to timing applications intended for continuous operation. A solution to both of these issues would be to limit the maximum count to the constrains of the 4 digit display - i.e. 999900 ms elapsed.
 
 Extension of the program would make the timing behaviour more similar to real life timing - i.e. 60 second minutes. Here the time would be formatted 0:00.0, with a maximum count time of 9 minutes, 59 seconds and 9 deciseconds. This was done in the serial monitor by converting the cumulative time count into the correct digit to display at each position using the modulo operator.
 ```JavaScript

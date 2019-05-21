@@ -2,6 +2,10 @@
 Project 1 for MG7013 Embedded Systems  
 Karl Crofskey, 2183664.
 
+![](https://learn.pimoroni.com/static/repos/learn/170pt-projects/qdsp6064-retro-display.jpg)
+
+(Pimoroni. Driving a 4-digit, 7-segment Display)
+
 ## Project Introduction
 
 The aim of this project is to create an embedded system circuit utilising a seven segment 4 digit 'bubble' display. This is in order to explore how the 7-seg display interfaces with a microcontroller in displaying specific and multiple numeric characters.  
@@ -10,7 +14,7 @@ A stop watch application was chosen for this purpose. Two buttons, START/STOP an
 
 The 7-seg display is of common cathode type (grounds of each digit's LEDs connected) and power (N-channel, enhancement type) mosfets will be used in order to sink the total current of each digit to ground, instead of into a digital I/O pin – this is due to the limted current sinking / sourcing capability of the microcontroller.  
 
-The buttons will be connected to external interrupts and will be debounced in order to prevent multiple button presses from being registered (due to contact switching).  
+The buttons will be connected to external interrupts and will be debounced in order to prevent multiple button presses from being registered (due to contact switching). 
 
 ## Circuit Schematic
 <img src="https://i.ibb.co/M6vz32c/schematic.jpg" alt="schematic" border="0">
@@ -101,6 +105,41 @@ The function performs the following, looping for digits 1 to 4:
 * Switch all segments off
 * Switch the relevant digit off
 
+### Button Interrupts and Debouncing
+```JavaScript
+uint8_t startstop_buttonPin = digitalPinToInterrupt(11);
+uint8_t reset_buttonPin = digitalPinToInterrupt(12);
+
+void setup(){
+  attachInterrupt(startstop_buttonPin,ISR_StartStop,FALLING);
+  attachInterrupt(reset_buttonPin,ISR_Reset,FALLING);
+}
+
+void ISR_StartStop(){
+  static uint32_t lastSSButtonPress_ms = 0;
+  if ((millis()-lastSSButtonPress_ms) >= DEBOUNCEDELAY_MS){ //debounce button
+    lastSSButtonPress_ms = millis(); //update button press time
+    Start_flag = !Start_flag; //toggle start stop flags
+    Stop_flag = !Stop_flag;
+    if(Start_flag){ //update starting reference point
+      starttime_millis = millis();
+    }
+  }
+}
+void ISR_Reset(){
+  static uint32_t lastRButtonPress_ms = 0;
+  if ((millis()-lastRButtonPress_ms) >= DEBOUNCEDELAY_MS){  //debounce button
+    lastRButtonPress_ms = millis();
+    Reset_flag = 1; //set flag to reset time
+  }
+}
+```
+Interrupts are attached to the button digital input pins. They call the relevant interrupt service routine and trigger on a falling edge - when the button being pressed establishes a connection to ground, dropping the voltage of that line from 3.3V to 0V.  
+
+The stopwatch has three boolean flags, Start_flag, Stop_flag and Reset_flag, which control the state of operation. These are set when the external interrupts are triggered. When the start button specifically has been pressed, the timer starting time is updated - timing is done by comparing the current time to this value.
+
+Debouncing of the buttons has been added with a delay of 200ms. When a button is pressed, the program waits this set time before any subsequent button press corresponds to any relevant action. This is necessary as many faux button presses are registered, due to contact switching, in the time it takes to physically press and release the button.
+
 ### Stopwatch Implementation
 
 ```JavaScript
@@ -121,16 +160,48 @@ The function performs the following, looping for digits 1 to 4:
     deciSecond = time_stopped_ms / 100;
   }
 ```
-The stopwatch has two boolean flags, Start_Flag and Reset_Flag, which control the state of operation. These are set when the relevant button press triggers an external interrupt.
+Millis() returns the amount of milliseconds elapsed since program execution. While counting, the difference between the current time and the time when the stopwatch was started is saved into 'time_elapsed_ms'. The stopwatch displays this increasing number by updating the current deciSecond count.
 
+The count when stopped is saved and displayed as 'time_stopped_ms'. This is added to the cumulative count 'total_time_elapsed_ms' so that the stop watch resumes from this point, when re-started.
 
-### Button Interrupts and Debouncing
-
+When the stop watch is reset, state flags are reset to their default logic state and the cumulative count is reset.
 
 
 ## System Verification
 
 ## Video
+
+
+## Conclusion
+
+An issue encountered was when the count exceeded the maximum 4 digit count of 999.9 into 5 digits. The number right-shifted one position (i.e. becoming 1999), resulting in the loss of count precision and potential confusion due to the placement of the decimal point. There is also an expected issue when the cumulative count overflows, if the timer is left counting long enough. A 32 bit unsigned integer represents a maximum count of 4,294,967,295 ms or approximately 49 days. Perhaps not relevant to this application, though applicable to timing applications intended for continuous operation. A solution to both of these issues would be to limit the maximum count to the constrains of the display - i.e. 999900 ms elapsed.
+
+Extension of the program would make the timing behaviour more similar to real life timing - i.e. 60 second minutes. Here the time would be formatted 0:00.0, with a maximum count time of 9 minutes, 59 seconds and 9 deciseconds. This was done in the serial monitor by converting the cumulative time count into the correct digit to display at each position using the modulo operator.
+```JavaScript
+//display time in 0:00.0 format
+// modulo 10 (%10) displays the ones digit of the number
+// timer should max out at 9:59.9 on display
+void displayTime(int time_ms){
+
+  //if time_ms >= 599900, display that (time_ms = 599900)
+  uint8_t min = (time_ms/60000) %10;
+  if(min >= 1){
+    time_ms = time_ms - min*60000; //for accurate sub-min count
+  }
+  uint8_t sec_10 = (time_ms/10000) %10;
+  uint8_t sec_1 = (time_ms/1000) %10;
+  uint8_t ms_100 = (time_ms/100) %10;
+  Serial.print(min);
+  Serial.print(":");
+  Serial.print(sec_10);
+  Serial.print(sec_1);
+  Serial.print(".");
+  Serial.println(ms_100);
+}
+```
+
+A further extension of the program would be implemenation of state machine design. Operation based on the state of the start, stop and reset flags could easily be converted to operation based on states of the same name. Here, transitions between the states would be triggered by the button presses and the program structure would look very similar to that of the program design.
+
 
 ## Appendix
 ### main.cpp
@@ -780,6 +851,14 @@ private:
 ```
 
 ## References
-7 seg 4 dig Bubble Display [QDSP6064](https://cdn.sparkfun.com/datasheets/Components/LED/BB_QDSP_DS.pdf)  
-N-channel enhancement type power MOSFET [IRLU8743 IPAK](https://www.infineon.com/dgdl/irlr8743pbf.pdf?fileId=5546d462533600a4015356719c7e26ff)
+
+Howard, P. _Driving a 4-digit, 7-segment display._ Retrieved from https://learn.pimoroni.com/static/repos/learn/170pt-projects/qdsp6064-retro-display.jpg  
+
+HP Components. _QDSP-6064 4-DIGITS MICRO NUMERIC INDICATOR (7 Segment Monolithic)._ Retrieved from https://cdn.sparkfun.com/datasheets/Components/LED/BB_QDSP_DS.pdf  
+
+International Rectifier. _IRLU8743PbF HEXFET Power MOSFET._ Retrieved from https://www.infineon.com/dgdl/irlr8743pbf.pdf?fileId=5546d462533600a4015356719c7e26ff  
+
+TutorialsPoint. _C library function sprintf()._ Retrieved from https://www.tutorialspoint.com/c_standard_library/c_function_sprintf.htm
+
+
 

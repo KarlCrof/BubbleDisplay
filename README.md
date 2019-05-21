@@ -10,9 +10,9 @@ Karl Crofskey, 2183664.
 
 The aim of this project is to create an embedded system circuit utilising a seven segment 4 digit 'bubble' display. This is in order to explore how the 7-seg display interfaces with a microcontroller in displaying specific and multiple numeric characters.  
 
-A stop watch application was chosen for this purpose. Two buttons, START/STOP and RESET, will be pushed by the user in order to control the stopwatch application. A tenth of a second was determined to be suitable timing resolution for this application and the required timing accuracy is a maximum of 100ms deviation from a comparison stopwatch, over 10 seconds (started at the same time). Timing will use the millis() arduino function.  
+A stop watch application was chosen for this purpose. Two buttons, START/STOP and RESET, will be pushed by the user in order to control the stopwatch application. A tenth of a second was determined to be suitable timing resolution for this application and the required timing accuracy is a maximum of 100ms deviation from a comparison stopwatch, over 10 seconds (started at the same time). Timing will use the millis() Arduino function.  
 
-The 7-seg display is of common cathode type (grounds of each digit's LEDs connected) and power (N-channel, enhancement type) mosfets will be used in order to sink the total current of each digit to ground, instead of into a digital I/O pin – this is due to the limted current sinking / sourcing capability of the microcontroller.  
+The 7-seg display is of common cathode type (grounds of each digit's LEDs connected) and power (N-channel, enhancement type) MOSFETs will be used in order to sink the total current of each digit to ground, instead of into a digital I/O pin – this is due to the limted current sinking / sourcing capability of the microcontroller.  
 
 The buttons will be connected to external interrupts and will be debounced in order to prevent multiple button presses from being registered (due to contact switching). 
 
@@ -168,9 +168,16 @@ When the stop watch is reset, state flags are reset to their default logic state
 
 
 ## System Verification
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=91QzzcyFhBQ
+" target="_blank"><img src="http://img.youtube.com/vi/91QzzcyFhBQ/0.jpg" 
+alt="verification" width="240" height="180" border="10" /></a>
 
-## Video
+Starting a digital stopwatch concurrently, the decisecond timing is accurate.
 
+## Project Video
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=KN3t0vwgOfI
+" target="_blank"><img src="http://img.youtube.com/vi/KN3t0vwgOfI/0.jpg" 
+alt="video" width="240" height="180" border="10" /></a>
 
 ## Conclusion
 
